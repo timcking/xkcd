@@ -15,8 +15,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'XKCD',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+          scaffoldBackgroundColor: const Color.fromARGB(255, 236, 214, 194)),
       home: const MyHomePage(title: 'XKCD'),
     );
   }
@@ -86,61 +87,57 @@ class _MyHomePageState extends State<MyHomePage> {
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                imageLoading
-                    ? Text('#$xkNumber $xkMonth/$xkDay/$xkYear',
-                        style: const TextStyle(
-                          fontSize: 14.0,
-                          fontFamily: 'Roboto',
-                          fontWeight: FontWeight.bold ))
-                    : Container(),
-                const SizedBox(height: 20),
-                imageLoading
-                    ? Image.network(
-                        xkcdImage,
-                        fit: BoxFit.contain,
-                      )
-                    : Container(),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
-                      style:
-                          ElevatedButton.styleFrom(primary: Colors.blueAccent),
-                      onPressed: () {
-                        getLatest();
-                      },
-                      child: const Text(
-                        'Latest',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20.0,
-                          fontFamily: 'Roboto',
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  imageLoading
+                      ? Text('#$xkNumber $xkMonth/$xkDay/$xkYear',
+                          style: const TextStyle(
+                              fontSize: 14.0,
+                              fontFamily: 'Roboto',
+                              fontWeight: FontWeight.bold))
+                      : Container(),
+                  const SizedBox(height: 20),
+                  imageLoading
+                      ? Image.network(
+                          xkcdImage,
+                          fit: BoxFit.fill,
+                        )
+                      : Container(),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          getLatest();
+                        },
+                        child: const Text(
+                          'Latest',
+                          style: TextStyle(
+                            fontSize: 20.0,
+                            fontFamily: 'Roboto',
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 20),
-                    ElevatedButton(
-                      style:
-                          ElevatedButton.styleFrom(primary: Colors.blueAccent),
-                      onPressed: () {
-                        getRandom();
-                      },
-                      child: const Text(
-                        'Random',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20.0,
-                          fontFamily: 'Roboto',
+                      const SizedBox(width: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          getRandom();
+                        },
+                        child: const Text(
+                          'Random',
+                          style: TextStyle(
+                            fontSize: 20.0,
+                            fontFamily: 'Roboto',
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
