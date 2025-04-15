@@ -13,7 +13,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'XKCD',
       theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
@@ -39,6 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
   var xkMonth;
   var xkDay;
   var xkYear;
+  var xkAlt;
   bool imageLoading = false;
 
   Xkcd xkcd = Xkcd();
@@ -60,6 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
       xkMonth = xkcdData['month'];
       xkDay = xkcdData['day'];
       xkYear = xkcdData['year'];
+      xkAlt = xkcdData['alt'];
     });
   }
 
@@ -74,6 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
       xkMonth = xkcdData['month'];
       xkDay = xkcdData['day'];
       xkYear = xkcdData['year'];
+      xkAlt = xkcdData['alt'];
     });
   }
 
@@ -82,8 +84,8 @@ class _MyHomePageState extends State<MyHomePage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.title),
-        ),
+            // title: Text(widget.title),
+            title: Text(xkAlt.toString())),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(8.0),

@@ -19,7 +19,7 @@ class Xkcd {
 
     int randomNumber = random.nextInt(maxNum);
 
-    var url = urlRandom + randomNumber.toString() + '/info.0.json';
+    var url = '$urlRandom$randomNumber/info.0.json';
     // Use this to test panels that are too high
     // var url = urlRandom + '298/info.0.json';
 
