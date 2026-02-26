@@ -84,8 +84,18 @@ class _MyHomePageState extends State<MyHomePage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-            // title: Text(widget.title),
-            title: Text(xkAlt.toString())),
+          title: Text(
+            xkAlt.toString(),
+            style: const TextStyle(
+              fontFamily: 'Roboto',
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+            softWrap: true,
+            overflow: TextOverflow.visible,
+            maxLines: 2, // You can adjust maxLines as needed
+          ),
+        ),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(8.0),

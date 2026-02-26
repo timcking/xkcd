@@ -1,0 +1,3 @@
+Add ability to save or copy a link for the toon.
+Add ability to search for a date.
+The Mac version here is the latest/best of xkcd.
