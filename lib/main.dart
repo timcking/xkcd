@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:xkcd/xkcd.dart';
 
 void main() {
@@ -146,6 +147,17 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void openExplain() async {
+    final uri = Uri.parse('https://www.explainxkcd.com/wiki/index.php/$xkNumber');
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not open explainxkcd.com')),
+        );
+      }
+    }
+  }
+
   void copyLink() {
     final url = 'https://xkcd.com/$xkNumber/';
     Clipboard.setData(ClipboardData(text: url));
@@ -208,6 +220,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 icon: const Icon(Icons.link),
                 tooltip: 'Copy link',
                 onPressed: copyLink,
+              ),
+            if (imageLoading)
+              IconButton(
+                icon: const Icon(Icons.help_outline),
+                tooltip: 'Explain on explainxkcd.com',
+                onPressed: openExplain,
               ),
           ],
         ),
