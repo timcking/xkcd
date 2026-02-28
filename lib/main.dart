@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:xkcd/xkcd.dart';
 
 void main() {
@@ -40,6 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
   var xkYear;
   var xkAlt;
   bool imageLoading = false;
+  bool isSearching = false;
 
   Xkcd xkcd = Xkcd();
 
@@ -62,6 +64,52 @@ class _MyHomePageState extends State<MyHomePage> {
       xkYear = xkcdData['year'];
       xkAlt = xkcdData['alt'];
     });
+  }
+
+  void searchByDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2006, 1, 1), // XKCD #1 was Jan 1, 2006
+      lastDate: DateTime.now(),
+    );
+    if (picked == null) return;
+
+    setState(() => isSearching = true);
+
+    final data = await xkcd.getByDate(picked.year, picked.month, picked.day);
+
+    setState(() => isSearching = false);
+
+    if (data == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'No comic found for ${picked.month}/${picked.day}/${picked.year}'),
+          ),
+        );
+      }
+      return;
+    }
+
+    setState(() {
+      imageLoading = true;
+      xkcdImage = data['img'].toString();
+      xkNumber = data['num'];
+      xkMonth = data['month'];
+      xkDay = data['day'];
+      xkYear = data['year'];
+      xkAlt = data['alt'];
+    });
+  }
+
+  void copyLink() {
+    final url = 'https://xkcd.com/$xkNumber/';
+    Clipboard.setData(ClipboardData(text: url));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Copied: $url')),
+    );
   }
 
   void getRandom() async {
@@ -95,6 +143,31 @@ class _MyHomePageState extends State<MyHomePage> {
             overflow: TextOverflow.visible,
             maxLines: 2, // You can adjust maxLines as needed
           ),
+          actions: [
+            if (isSearching)
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Center(
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ),
+              )
+            else
+              IconButton(
+                icon: const Icon(Icons.calendar_month),
+                tooltip: 'Search by date',
+                onPressed: searchByDate,
+              ),
+            if (imageLoading)
+              IconButton(
+                icon: const Icon(Icons.link),
+                tooltip: 'Copy link',
+                onPressed: copyLink,
+              ),
+          ],
         ),
         body: Center(
           child: Padding(

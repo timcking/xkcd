@@ -35,4 +35,46 @@ class Xkcd {
     var xkcdData = await networkHelper.getData();
     return xkcdData['num'];
   }
+
+  Future<dynamic> getByNum(int num) async {
+    var url = '${urlRandom}$num/info.0.json';
+    NetworkHelper networkHelper = NetworkHelper(Uri.parse(url));
+    return await networkHelper.getData();
+  }
+
+  // Binary search by date. Returns null if no comic on that date.
+  Future<dynamic> getByDate(int year, int month, int day) async {
+    var maxNum = await getMaxNum();
+    final targetDate = DateTime(year, month, day);
+
+    int low = 1;
+    int high = maxNum;
+
+    while (low <= high) {
+      int mid = (low + high) ~/ 2;
+      if (mid == 404) mid = 405; // comic 404 doesn't exist
+
+      var data = await getByNum(mid);
+      if (data == null) {
+        low = mid + 1;
+        continue;
+      }
+
+      final comicDate = DateTime(
+        int.parse(data['year'].toString()),
+        int.parse(data['month'].toString()),
+        int.parse(data['day'].toString()),
+      );
+
+      if (comicDate == targetDate) {
+        return data;
+      } else if (comicDate.isBefore(targetDate)) {
+        low = mid + 1;
+      } else {
+        high = mid - 1;
+      }
+    }
+
+    return null;
+  }
 }
