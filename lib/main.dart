@@ -42,6 +42,7 @@ class _MyHomePageState extends State<MyHomePage> {
   var xkAlt;
   bool imageLoading = false;
   bool isSearching = false;
+  int xkMaxNum = 0;
 
   Xkcd xkcd = Xkcd();
 
@@ -59,10 +60,51 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       xkcdImage = xkcdData['img'].toString();
       xkNumber = xkcdData['num'];
+      xkMaxNum = xkcdData['num'];
       xkMonth = xkcdData['month'];
       xkDay = xkcdData['day'];
       xkYear = xkcdData['year'];
       xkAlt = xkcdData['alt'];
+    });
+  }
+
+  void getPrevious() async {
+    int prevNum = xkNumber - 1;
+    if (prevNum == 404) prevNum = 403;
+    if (prevNum < 1) return;
+
+    imageLoading = false;
+    final data = await xkcd.getByNum(prevNum);
+    if (data == null) return;
+
+    setState(() {
+      imageLoading = true;
+      xkcdImage = data['img'].toString();
+      xkNumber = data['num'];
+      xkMonth = data['month'];
+      xkDay = data['day'];
+      xkYear = data['year'];
+      xkAlt = data['alt'];
+    });
+  }
+
+  void getNext() async {
+    int nextNum = xkNumber + 1;
+    if (nextNum == 404) nextNum = 405;
+    if (nextNum > xkMaxNum) return;
+
+    imageLoading = false;
+    final data = await xkcd.getByNum(nextNum);
+    if (data == null) return;
+
+    setState(() {
+      imageLoading = true;
+      xkcdImage = data['img'].toString();
+      xkNumber = data['num'];
+      xkMonth = data['month'];
+      xkDay = data['day'];
+      xkYear = data['year'];
+      xkAlt = data['alt'];
     });
   }
 
@@ -194,6 +236,20 @@ class _MyHomePageState extends State<MyHomePage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      ElevatedButton.icon(
+                        onPressed: (imageLoading && xkNumber > 1)
+                            ? getPrevious
+                            : null,
+                        icon: const Icon(Icons.arrow_back),
+                        label: const Text(
+                          'Prev',
+                          style: TextStyle(
+                            fontSize: 20.0,
+                            fontFamily: 'Roboto',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
                       ElevatedButton(
                         onPressed: () {
                           getLatest();
@@ -206,13 +262,28 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 20),
+                      const SizedBox(width: 12),
                       ElevatedButton(
                         onPressed: () {
                           getRandom();
                         },
                         child: const Text(
                           'Random',
+                          style: TextStyle(
+                            fontSize: 20.0,
+                            fontFamily: 'Roboto',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      ElevatedButton.icon(
+                        onPressed: (imageLoading && xkNumber < xkMaxNum)
+                            ? getNext
+                            : null,
+                        icon: const Icon(Icons.arrow_forward),
+                        iconAlignment: IconAlignment.end,
+                        label: const Text(
+                          'Next',
                           style: TextStyle(
                             fontSize: 20.0,
                             fontFamily: 'Roboto',
