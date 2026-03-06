@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:window_manager/window_manager.dart';
 import 'package:xkcd/xkcd.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await windowManager.ensureInitialized();
-  await windowManager.waitUntilReadyToShow(
-    const WindowOptions(titleBarStyle: TitleBarStyle.hidden),
-  );
+void main() {
   runApp(const MyApp());
 }
 
@@ -188,188 +182,132 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Material(
-      child: SafeArea(
-        child: Column(
-          children: [
-            // Custom title bar replacing the native OS title bar
-            DragToMoveArea(
-              child: Container(
-                height: 40,
-                color: colorScheme.primaryContainer,
-                child: Row(
-                  children: [
-                    const SizedBox(width: 16),
-                    Text(
-                      'XKCD',
-                      style: TextStyle(
-                        fontFamily: 'Roboto',
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onPrimaryContainer,
-                      ),
-                    ),
-                    const Spacer(),
-                    IconButton(
-                      icon: Icon(Icons.minimize,
-                          size: 18, color: colorScheme.onPrimaryContainer),
-                      tooltip: 'Minimize',
-                      onPressed: () => windowManager.minimize(),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.crop_square,
-                          size: 18, color: colorScheme.onPrimaryContainer),
-                      tooltip: 'Maximize',
-                      onPressed: () async {
-                        if (await windowManager.isMaximized()) {
-                          windowManager.unmaximize();
-                        } else {
-                          windowManager.maximize();
-                        }
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.close,
-                          size: 18, color: colorScheme.onPrimaryContainer),
-                      tooltip: 'Close',
-                      onPressed: () => windowManager.close(),
-                    ),
-                  ],
-                ),
-              ),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            xkAlt.toString(),
+            style: const TextStyle(
+              fontFamily: 'Roboto',
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
             ),
-            // Main app content
-            Expanded(
-              child: Scaffold(
-                appBar: AppBar(
-                  title: Text(
-                    xkAlt.toString(),
-                    style: const TextStyle(
-                      fontFamily: 'Roboto',
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    softWrap: true,
-                    overflow: TextOverflow.visible,
-                    maxLines: 2,
+            softWrap: true,
+            overflow: TextOverflow.visible,
+            maxLines: 2,
+          ),
+          actions: [
+            if (isSearching)
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Center(
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
                   ),
-                  actions: [
-                    if (isSearching)
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Center(
-                          child: SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              )
+            else
+              IconButton(
+                icon: const Icon(Icons.calendar_month),
+                tooltip: 'Search by date',
+                onPressed: searchByDate,
+              ),
+            if (imageLoading)
+              IconButton(
+                icon: const Icon(Icons.link),
+                tooltip: 'Copy link',
+                onPressed: copyLink,
+              ),
+            if (imageLoading)
+              IconButton(
+                icon: const Icon(Icons.help_outline),
+                tooltip: 'Explain on explainxkcd.com',
+                onPressed: openExplain,
+              ),
+          ],
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  imageLoading
+                      ? Text('#$xkNumber $xkMonth/$xkDay/$xkYear',
+                          style: const TextStyle(
+                              fontSize: 14.0,
+                              fontFamily: 'Roboto',
+                              fontWeight: FontWeight.bold))
+                      : Container(),
+                  const SizedBox(height: 20),
+                  imageLoading
+                      ? Image.network(
+                          xkcdImage,
+                          fit: BoxFit.fill,
+                        )
+                      : Container(),
+                  const SizedBox(height: 20),
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: (imageLoading && xkNumber > 1)
+                            ? getPrevious
+                            : null,
+                        icon: const Icon(Icons.arrow_back),
+                        label: const Text(
+                          'Prev',
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            fontFamily: 'Roboto',
                           ),
                         ),
-                      )
-                    else
-                      IconButton(
-                        icon: const Icon(Icons.calendar_month),
-                        tooltip: 'Search by date',
-                        onPressed: searchByDate,
                       ),
-                    if (imageLoading)
-                      IconButton(
-                        icon: const Icon(Icons.link),
-                        tooltip: 'Copy link',
-                        onPressed: copyLink,
-                      ),
-                    if (imageLoading)
-                      IconButton(
-                        icon: const Icon(Icons.help_outline),
-                        tooltip: 'Explain on explainxkcd.com',
-                        onPressed: openExplain,
-                      ),
-                  ],
-                ),
-                body: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          imageLoading
-                              ? Text('#$xkNumber $xkMonth/$xkDay/$xkYear',
-                                  style: const TextStyle(
-                                      fontSize: 14.0,
-                                      fontFamily: 'Roboto',
-                                      fontWeight: FontWeight.bold))
-                              : Container(),
-                          const SizedBox(height: 20),
-                          imageLoading
-                              ? Image.network(
-                                  xkcdImage,
-                                  fit: BoxFit.fill,
-                                )
-                              : Container(),
-                          const SizedBox(height: 20),
-                          Wrap(
-                            alignment: WrapAlignment.center,
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: [
-                              ElevatedButton.icon(
-                                onPressed: (imageLoading && xkNumber > 1)
-                                    ? getPrevious
-                                    : null,
-                                icon: const Icon(Icons.arrow_back),
-                                label: const Text(
-                                  'Prev',
-                                  style: TextStyle(
-                                    fontSize: 14.0,
-                                    fontFamily: 'Roboto',
-                                  ),
-                                ),
-                              ),
-                              ElevatedButton(
-                                onPressed: () => getLatest(),
-                                child: const Text(
-                                  'Latest',
-                                  style: TextStyle(
-                                    fontSize: 14.0,
-                                    fontFamily: 'Roboto',
-                                  ),
-                                ),
-                              ),
-                              ElevatedButton(
-                                onPressed: () => getRandom(),
-                                child: const Text(
-                                  'Random',
-                                  style: TextStyle(
-                                    fontSize: 14.0,
-                                    fontFamily: 'Roboto',
-                                  ),
-                                ),
-                              ),
-                              ElevatedButton.icon(
-                                onPressed: (imageLoading && xkNumber < xkMaxNum)
-                                    ? getNext
-                                    : null,
-                                icon: const Icon(Icons.arrow_forward),
-                                iconAlignment: IconAlignment.end,
-                                label: const Text(
-                                  'Next',
-                                  style: TextStyle(
-                                    fontSize: 14.0,
-                                    fontFamily: 'Roboto',
-                                  ),
-                                ),
-                              ),
-                            ],
+                      ElevatedButton(
+                        onPressed: () => getLatest(),
+                        child: const Text(
+                          'Latest',
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            fontFamily: 'Roboto',
                           ),
-                        ],
+                        ),
                       ),
-                    ),
+                      ElevatedButton(
+                        onPressed: () => getRandom(),
+                        child: const Text(
+                          'Random',
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            fontFamily: 'Roboto',
+                          ),
+                        ),
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: (imageLoading && xkNumber < xkMaxNum)
+                            ? getNext
+                            : null,
+                        icon: const Icon(Icons.arrow_forward),
+                        iconAlignment: IconAlignment.end,
+                        label: const Text(
+                          'Next',
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            fontFamily: 'Roboto',
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
