@@ -263,7 +263,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         label: const Text(
                           'Prev',
                           style: TextStyle(
-                            fontSize: 14.0,
+                            fontSize: 12.0,
                             fontFamily: 'Roboto',
                           ),
                         ),
@@ -273,7 +273,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: const Text(
                           'Latest',
                           style: TextStyle(
-                            fontSize: 14.0,
+                            fontSize: 12.0,
                             fontFamily: 'Roboto',
                           ),
                         ),
@@ -283,7 +283,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: const Text(
                           'Random',
                           style: TextStyle(
-                            fontSize: 14.0,
+                            fontSize: 12.0,
                             fontFamily: 'Roboto',
                           ),
                         ),
@@ -297,7 +297,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         label: const Text(
                           'Next',
                           style: TextStyle(
-                            fontSize: 14.0,
+                            fontSize: 12.0,
                             fontFamily: 'Roboto',
                           ),
                         ),
