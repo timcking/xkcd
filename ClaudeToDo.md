@@ -19,4 +19,4 @@
   \- Error handling if the network request fails 
   \- Offline support / caching so previously viewed comics load without internet 
 
-  The most impactful ones for everyday use are probably **Previous/Next** **navigation**, **pinch-to-zoom**, and **showing** **the** **comic** **title**. Any of those appeal to you?
+The most impactful ones for everyday use are probably **Previous/Next** **navigation**, **pinch-to-zoom**, and **showing** **the** **comic** **title**. Any of those appeal to you?
