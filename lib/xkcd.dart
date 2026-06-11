@@ -37,7 +37,7 @@ class Xkcd {
   }
 
   Future<dynamic> getByNum(int num) async {
-    var url = '${urlRandom}$num/info.0.json';
+    var url = '$urlRandom$num/info.0.json';
     NetworkHelper networkHelper = NetworkHelper(Uri.parse(url));
     return await networkHelper.getData();
   }
